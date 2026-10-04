@@ -1,0 +1,3750 @@
+<!DOCTYPE html>
+<html lang="sl">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- ZELO POMEMBNO ZA TELEFON -->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <title>Poker Tournament Timer</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- ====================================================== -->
+<!-- NASTAVITVE                                             -->
+<!-- ====================================================== -->
+
+<div id="nastavitve">
+
+    <h1>♠ POKER TOURNAMENT ♠</h1>
+
+    <h2>Nastavitev turnirja</h2>
+
+
+    <!-- IME TURNIRJA -->
+
+    <div class="setup-card">
+
+        <div class="setup-field">
+
+            <label>
+                IME TURNIRJA
+            </label>
+
+            <input
+                type="text"
+                id="imeTurnirja"
+                placeholder="npr. Petkov poker"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- LEVELI IN BREAKI -->
+
+    <div id="levels">
+
+        <div
+            class="level-item"
+            data-tip="level"
+        >
+
+            <h3>
+                Level 1
+            </h3>
+
+
+            <div class="level-fields">
+
+                <div>
+
+                    <label>
+                        SMALL BLIND
+                    </label>
+
+                    <input
+                        type="number"
+                        class="smallBlind"
+                        placeholder="10"
+                        min="1"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        BIG BLIND
+                    </label>
+
+                    <input
+                        type="number"
+                        class="bigBlind"
+                        placeholder="20"
+                        min="1"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        ČAS (MINUTE)
+                    </label>
+
+                    <input
+                        type="number"
+                        class="levelTime"
+                        placeholder="15"
+                        min="1"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="item-actions">
+
+                <button
+                    class="move-button move-up"
+                    onclick="premakniGor(this)"
+                >
+                    ↑ GOR
+                </button>
+
+
+                <button
+                    class="move-button move-down"
+                    onclick="premakniDol(this)"
+                >
+                    ↓ DOL
+                </button>
+
+
+                <button
+                    class="delete-button"
+                    onclick="izbrisiElement(this)"
+                >
+                    ✕ IZBRIŠI
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- DODAJ -->
+
+    <div class="setup-buttons">
+
+        <button onclick="dodajLevel()">
+            + DODAJ LEVEL
+        </button>
+
+        <button onclick="dodajBreak()">
+            ☕ DODAJ BREAK
+        </button>
+
+    </div>
+
+
+    <!-- SHRANI / ZAČNI -->
+
+    <div class="main-buttons">
+
+        <button onclick="shraniTurnir()">
+            💾 SHRANI TURNIR
+        </button>
+
+        <button
+            class="start-button"
+            onclick="pripraviTurnir()"
+        >
+            ▶ ZAČNI TURNIR
+        </button>
+
+    </div>
+
+
+    <!-- SHRANJENI TURNIRJI -->
+
+    <div class="shranjeni">
+
+        <h2>
+            Shranjeni turnirji
+        </h2>
+
+        <div id="shranjeniTurnirji">
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- TURNIR                                                 -->
+<!-- ====================================================== -->
+
+<div
+    id="turnir"
+    style="display:none;"
+>
+
+    <!-- ZGORNJA VRSTICA -->
+
+    <div class="tournament-top">
+
+        <div class="top-left">
+
+            <div class="mini-label">
+                TURNIR
+            </div>
+
+            <div id="turnirImePrikaz">
+                Poker Tournament
+            </div>
+
+        </div>
+
+
+        <div class="top-right tournament-time-info">
+
+            <div class="time-info-box">
+
+                <div class="mini-label">
+                    ZAČETEK IGRANJA
+                </div>
+
+                <div id="zacetekPrikaz">
+                    --:--
+                </div>
+
+            </div>
+
+
+            <div class="time-info-box">
+
+                <div class="mini-label">
+                    ČAS IGRANJA
+                </div>
+
+                <div id="trajanjePrikaz">
+                    00:00:00
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- LOGO -->
+
+    <h1 class="logo">
+        ♠ POKER TOURNAMENT ♠
+    </h1>
+
+
+    <!-- LEVEL -->
+
+    <h2 id="levelNaslov">
+        LEVEL 1
+    </h2>
+
+
+    <!-- BLINDI -->
+
+    <div
+        id="blindPrikaz"
+        class="blindi"
+    >
+
+        <div class="blindBox">
+
+            <p>
+                SMALL BLIND
+            </p>
+
+            <h1 id="trenutniSB">
+                0
+            </h1>
+
+        </div>
+
+
+        <div class="blindBox">
+
+            <p>
+                BIG BLIND
+            </p>
+
+            <h1 id="trenutniBB">
+                0
+            </h1>
+
+        </div>
+
+    </div>
+
+
+    <!-- BREAK -->
+
+    <div
+        id="breakPrikaz"
+        style="display:none;"
+    >
+
+        <div class="break-box">
+
+            <div class="break-icon">
+                ☕
+            </div>
+
+            <h1>
+                BREAK
+            </h1>
+
+            <p>
+                ČAS ZA ODMOR
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- TIMER -->
+
+    <h1 id="timer">
+        00:00
+    </h1>
+
+
+    <div
+        id="timerStatus"
+        class="timer-status"
+    >
+        PRIPRAVLJEN
+    </div>
+
+
+    <!-- GLAVNE KONTROLE -->
+
+    <div class="controls">
+
+        <button onclick="prejsnjiLevel()">
+            ◀ PREJŠNJI
+        </button>
+
+
+        <button
+            id="startPauseButton"
+            class="start-pause-button"
+            onclick="startPauseTimer()"
+        >
+            ▶ START
+        </button>
+
+
+        <button onclick="naslednjiLevel()">
+            NASLEDNJI ▶
+        </button>
+
+    </div>
+
+
+    <!-- +/- MINUTA -->
+
+    <div class="time-adjust">
+
+        <button onclick="spremeniCas(-60)">
+            − 1 MIN
+        </button>
+
+        <button onclick="spremeniCas(60)">
+            + 1 MIN
+        </button>
+
+    </div>
+
+
+    <!-- NASLEDNJI -->
+
+    <div class="next-info">
+
+        <p>
+            NASLEDNJI
+        </p>
+
+        <h3 id="naslednjiPrikaz">
+            -
+        </h3>
+
+    </div>
+
+
+    <!-- SPODNJI GUMBI -->
+
+    <div class="bottom-controls">
+
+        <button onclick="fullscreen()">
+            ⛶ CELOTEN ZASLON
+        </button>
+
+
+        <button
+            class="exit-button"
+            onclick="koncajPrikaz()"
+        >
+            ⚙ NAZAJ NA NASTAVITVE
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- POTRDITVENO OKNO                                       -->
+<!-- ====================================================== -->
+
+<div
+    id="confirmOverlay"
+    class="modal-overlay"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-icon">
+            ♠
+        </div>
+
+        <h2 id="confirmNaslov">
+            Potrditev
+        </h2>
+
+        <p id="confirmBesedilo">
+            Ali želiš nadaljevati?
+        </p>
+
+
+        <div class="modal-buttons">
+
+            <button
+                class="secondary-button"
+                onclick="zapriPotrditev()"
+            >
+                PREKLIČI
+            </button>
+
+            <button onclick="potrdiDejanje()">
+                V REDU
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- OBVESTILO                                              -->
+<!-- ====================================================== -->
+
+<div
+    id="infoOverlay"
+    class="modal-overlay"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-icon">
+            ♠
+        </div>
+
+        <h2 id="infoNaslov">
+            Obvestilo
+        </h2>
+
+        <p id="infoBesedilo">
+            -
+        </p>
+
+
+        <div class="modal-buttons">
+
+            <button onclick="zapriObvestilo()">
+                V REDU
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ====================================================== -->
+<!-- OBNOVITEV AKTIVNEGA TURNIRJA                           -->
+<!-- ====================================================== -->
+
+<div
+    id="resumeOverlay"
+    class="modal-overlay"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-icon">
+            ♠
+        </div>
+
+        <h2>
+            Aktivni turnir
+        </h2>
+
+        <p id="resumeBesedilo">
+            Shranjen je nedokončan turnir.
+        </p>
+
+
+        <div class="modal-buttons">
+
+            <button
+                class="danger-button"
+                onclick="zavrziAktivniTurnir()"
+            >
+                ZAVRZI
+            </button>
+
+            <button onclick="nadaljujAktivniTurnir()">
+                ▶ NADALJUJ
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+/* ======================================================== */
+/* SPREMENLJIVKE                                            */
+/* ======================================================== */
+
+let leveli = [];
+
+let trenutniLevel = 0;
+
+let preostaliCas = 0;
+
+let interval = null;
+
+let trajanjeInterval = null;
+
+let timerTece = false;
+
+let konecOb = null;
+
+let audioContext = null;
+
+let dejanjePoPotrditvi = null;
+
+let zadnjiPrikazanCas = null;
+
+let turnirKoncan = false;
+
+let zacetekIgranja = null;
+
+
+
+/* ======================================================== */
+/* ZVOK                                                     */
+/* ======================================================== */
+
+function pripraviZvok() {
+
+    if (!audioContext) {
+
+        audioContext = new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+
+    }
+
+
+    if (
+        audioContext.state ===
+        "suspended"
+    ) {
+
+        audioContext.resume();
+
+    }
+
+}
+
+
+
+function predvajajZvok(
+    frekvenca,
+    trajanje,
+    glasnost = 0.15
+) {
+
+    pripraviZvok();
+
+
+    let oscillator =
+        audioContext.createOscillator();
+
+
+    let gain =
+        audioContext.createGain();
+
+
+    oscillator.connect(
+        gain
+    );
+
+
+    gain.connect(
+        audioContext.destination
+    );
+
+
+    oscillator.type =
+        "sine";
+
+
+    oscillator.frequency.value =
+        frekvenca;
+
+
+    gain.gain.setValueAtTime(
+        glasnost,
+        audioContext.currentTime
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioContext.currentTime +
+        trajanje
+    );
+
+
+    oscillator.start();
+
+
+    oscillator.stop(
+        audioContext.currentTime +
+        trajanje
+    );
+
+}
+
+
+
+/* ======================================================== */
+/* MODALNA OKNA                                             */
+/* ======================================================== */
+
+function pokaziPotrditev(
+    naslov,
+    besedilo,
+    dejanje
+) {
+
+    document.getElementById(
+        "confirmNaslov"
+    ).innerText =
+        naslov;
+
+
+    document.getElementById(
+        "confirmBesedilo"
+    ).innerText =
+        besedilo;
+
+
+    dejanjePoPotrditvi =
+        dejanje;
+
+
+    document.getElementById(
+        "confirmOverlay"
+    ).classList.add(
+        "show"
+    );
+
+}
+
+
+
+function zapriPotrditev() {
+
+    document.getElementById(
+        "confirmOverlay"
+    ).classList.remove(
+        "show"
+    );
+
+
+    dejanjePoPotrditvi =
+        null;
+
+}
+
+
+
+function potrdiDejanje() {
+
+    let dejanje =
+        dejanjePoPotrditvi;
+
+
+    zapriPotrditev();
+
+
+    if (dejanje) {
+
+        dejanje();
+
+    }
+
+}
+
+
+
+function pokaziObvestilo(
+    naslov,
+    besedilo
+) {
+
+    document.getElementById(
+        "infoNaslov"
+    ).innerText =
+        naslov;
+
+
+    document.getElementById(
+        "infoBesedilo"
+    ).innerText =
+        besedilo;
+
+
+    document.getElementById(
+        "infoOverlay"
+    ).classList.add(
+        "show"
+    );
+
+}
+
+
+
+function zapriObvestilo() {
+
+    document.getElementById(
+        "infoOverlay"
+    ).classList.remove(
+        "show"
+    );
+
+}
+
+
+
+/* ======================================================== */
+/* ZAČETEK IGRANJA                                          */
+/* ======================================================== */
+
+function nastaviZacetekIgranja() {
+
+    if (
+        zacetekIgranja !== null
+    ) {
+
+        return;
+
+    }
+
+
+    zacetekIgranja =
+        Date.now();
+
+
+    prikaziZacetekIgranja();
+
+    zazeniStevecIgranja();
+
+    shraniAktivniTurnir();
+
+}
+
+
+
+function prikaziZacetekIgranja() {
+
+    if (!zacetekIgranja) {
+
+        document.getElementById(
+            "zacetekPrikaz"
+        ).innerText =
+            "--:--";
+
+        return;
+
+    }
+
+
+    let datum =
+        new Date(
+            zacetekIgranja
+        );
+
+
+    let ure =
+        String(
+            datum.getHours()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    let minute =
+        String(
+            datum.getMinutes()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    document.getElementById(
+        "zacetekPrikaz"
+    ).innerText =
+        ure +
+        ":" +
+        minute;
+
+}
+
+
+
+/* ======================================================== */
+/* ČAS IGRANJA                                              */
+/* ======================================================== */
+
+function prikaziTrajanjeIgranja() {
+
+    if (!zacetekIgranja) {
+
+        document.getElementById(
+            "trajanjePrikaz"
+        ).innerText =
+            "00:00:00";
+
+        return;
+
+    }
+
+
+    let skupajSekund =
+        Math.floor(
+            (
+                Date.now() -
+                zacetekIgranja
+            ) / 1000
+        );
+
+
+    if (
+        skupajSekund < 0
+    ) {
+
+        skupajSekund = 0;
+
+    }
+
+
+    let ure =
+        Math.floor(
+            skupajSekund / 3600
+        );
+
+
+    let minute =
+        Math.floor(
+            (
+                skupajSekund %
+                3600
+            ) / 60
+        );
+
+
+    let sekunde =
+        skupajSekund % 60;
+
+
+    document.getElementById(
+        "trajanjePrikaz"
+    ).innerText =
+
+        String(
+            ure
+        ).padStart(
+            2,
+            "0"
+        )
+        +
+        ":"
+        +
+        String(
+            minute
+        ).padStart(
+            2,
+            "0"
+        )
+        +
+        ":"
+        +
+        String(
+            sekunde
+        ).padStart(
+            2,
+            "0"
+        );
+
+}
+
+
+
+function zazeniStevecIgranja() {
+
+    prikaziTrajanjeIgranja();
+
+
+    if (
+        trajanjeInterval
+    ) {
+
+        clearInterval(
+            trajanjeInterval
+        );
+
+    }
+
+
+    trajanjeInterval =
+        setInterval(
+            prikaziTrajanjeIgranja,
+            1000
+        );
+
+}
+
+
+
+function ustaviStevecIgranja() {
+
+    if (
+        trajanjeInterval
+    ) {
+
+        clearInterval(
+            trajanjeInterval
+        );
+
+
+        trajanjeInterval =
+            null;
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* ŠTEVILČENJE LEVELOV                                      */
+/* ======================================================== */
+
+function osveziStevilkeLevelov() {
+
+    let elementi =
+        document.querySelectorAll(
+            "#levels .level-item"
+        );
+
+
+    let stevilka =
+        1;
+
+
+    elementi.forEach(
+        function(element) {
+
+            if (
+                element.dataset.tip ===
+                "level"
+            ) {
+
+                element.querySelector(
+                    "h3"
+                ).innerText =
+                    "Level " +
+                    stevilka;
+
+
+                stevilka++;
+
+            }
+
+        }
+    );
+
+
+    osveziGumbeZaPremikanje();
+
+}
+
+
+
+/* ======================================================== */
+/* PREMIKANJE LEVELOV                                       */
+/* ======================================================== */
+
+function osveziGumbeZaPremikanje() {
+
+    let elementi =
+        document.querySelectorAll(
+            "#levels .level-item"
+        );
+
+
+    elementi.forEach(
+        function(
+            element,
+            index
+        ) {
+
+            let gor =
+                element.querySelector(
+                    ".move-up"
+                );
+
+
+            let dol =
+                element.querySelector(
+                    ".move-down"
+                );
+
+
+            if (gor) {
+
+                gor.disabled =
+                    index === 0;
+
+            }
+
+
+            if (dol) {
+
+                dol.disabled =
+                    index ===
+                    elementi.length - 1;
+
+            }
+
+        }
+    );
+
+}
+
+
+
+function premakniGor(gumb) {
+
+    let element =
+        gumb.closest(
+            ".level-item"
+        );
+
+
+    let prejsnji =
+        element.previousElementSibling;
+
+
+    if (!prejsnji) {
+
+        return;
+
+    }
+
+
+    element.parentNode.insertBefore(
+        element,
+        prejsnji
+    );
+
+
+    osveziStevilkeLevelov();
+
+}
+
+
+
+function premakniDol(gumb) {
+
+    let element =
+        gumb.closest(
+            ".level-item"
+        );
+
+
+    let naslednji =
+        element.nextElementSibling;
+
+
+    if (!naslednji) {
+
+        return;
+
+    }
+
+
+    element.parentNode.insertBefore(
+        naslednji,
+        element
+    );
+
+
+    osveziStevilkeLevelov();
+
+}
+
+
+
+/* ======================================================== */
+/* HTML GUMBOV                                              */
+/* ======================================================== */
+
+function htmlGumbiElementa() {
+
+    return `
+
+        <div class="item-actions">
+
+            <button
+                class="move-button move-up"
+                onclick="premakniGor(this)"
+            >
+                ↑ GOR
+            </button>
+
+            <button
+                class="move-button move-down"
+                onclick="premakniDol(this)"
+            >
+                ↓ DOL
+            </button>
+
+            <button
+                class="delete-button"
+                onclick="izbrisiElement(this)"
+            >
+                ✕ IZBRIŠI
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+
+/* ======================================================== */
+/* DODAJ LEVEL                                              */
+/* ======================================================== */
+
+function dodajLevel() {
+
+    let levels =
+        document.getElementById(
+            "levels"
+        );
+
+
+    let novi =
+        document.createElement(
+            "div"
+        );
+
+
+    novi.className =
+        "level-item";
+
+
+    novi.dataset.tip =
+        "level";
+
+
+    novi.innerHTML = `
+
+        <h3>
+            Level
+        </h3>
+
+        <div class="level-fields">
+
+            <div>
+
+                <label>
+                    SMALL BLIND
+                </label>
+
+                <input
+                    type="number"
+                    class="smallBlind"
+                    placeholder="100"
+                    min="1"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    BIG BLIND
+                </label>
+
+                <input
+                    type="number"
+                    class="bigBlind"
+                    placeholder="200"
+                    min="1"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    ČAS (MINUTE)
+                </label>
+
+                <input
+                    type="number"
+                    class="levelTime"
+                    placeholder="15"
+                    min="1"
+                >
+
+            </div>
+
+        </div>
+
+        ${htmlGumbiElementa()}
+
+    `;
+
+
+    levels.appendChild(
+        novi
+    );
+
+
+    osveziStevilkeLevelov();
+
+}
+
+
+
+/* ======================================================== */
+/* DODAJ BREAK                                              */
+/* ======================================================== */
+
+function dodajBreak() {
+
+    let levels =
+        document.getElementById(
+            "levels"
+        );
+
+
+    let novi =
+        document.createElement(
+            "div"
+        );
+
+
+    novi.className =
+        "level-item break-item";
+
+
+    novi.dataset.tip =
+        "break";
+
+
+    novi.innerHTML = `
+
+        <h3>
+            ☕ BREAK
+        </h3>
+
+        <div class="level-fields">
+
+            <div>
+
+                <label>
+                    ČAS ODMORA (MINUTE)
+                </label>
+
+                <input
+                    type="number"
+                    class="breakTime"
+                    placeholder="10"
+                    min="1"
+                >
+
+            </div>
+
+        </div>
+
+        ${htmlGumbiElementa()}
+
+    `;
+
+
+    levels.appendChild(
+        novi
+    );
+
+
+    osveziStevilkeLevelov();
+
+}
+
+
+
+/* ======================================================== */
+/* IZBRIŠI ELEMENT                                          */
+/* ======================================================== */
+
+function izbrisiElement(
+    gumb
+) {
+
+    let elementi =
+        document.querySelectorAll(
+            "#levels .level-item"
+        );
+
+
+    if (
+        elementi.length <= 1
+    ) {
+
+        pokaziObvestilo(
+            "Ni mogoče izbrisati",
+            "Turnir mora imeti vsaj en level."
+        );
+
+        return;
+
+    }
+
+
+    let element =
+        gumb.closest(
+            ".level-item"
+        );
+
+
+    element.remove();
+
+
+    osveziStevilkeLevelov();
+
+}
+
+
+
+/* ======================================================== */
+/* PREBERI STRUKTURO                                        */
+/* ======================================================== */
+
+function preberiStrukturo() {
+
+    let elementi =
+        document.querySelectorAll(
+            "#levels .level-item"
+        );
+
+
+    let struktura =
+        [];
+
+
+    for (
+        let i = 0;
+        i < elementi.length;
+        i++
+    ) {
+
+        let element =
+            elementi[i];
+
+
+        let tip =
+            element.dataset.tip;
+
+
+        if (
+            tip === "level"
+        ) {
+
+            let sb =
+                Number(
+                    element.querySelector(
+                        ".smallBlind"
+                    ).value
+                );
+
+
+            let bb =
+                Number(
+                    element.querySelector(
+                        ".bigBlind"
+                    ).value
+                );
+
+
+            let cas =
+                Number(
+                    element.querySelector(
+                        ".levelTime"
+                    ).value
+                );
+
+
+            if (
+                sb <= 0 ||
+                bb <= 0 ||
+                cas <= 0
+            ) {
+
+                pokaziObvestilo(
+                    "Manjkajo podatki",
+                    "Pri vseh levelih vpiši Small Blind, Big Blind in čas."
+                );
+
+                return null;
+
+            }
+
+
+            if (
+                bb <= sb
+            ) {
+
+                pokaziObvestilo(
+                    "Preveri blinde",
+                    "Big Blind mora biti večji od Small Blinda."
+                );
+
+                return null;
+
+            }
+
+
+            struktura.push({
+
+                tip: "level",
+
+                sb: sb,
+
+                bb: bb,
+
+                cas: cas
+
+            });
+
+        }
+
+
+        else if (
+            tip === "break"
+        ) {
+
+            let cas =
+                Number(
+                    element.querySelector(
+                        ".breakTime"
+                    ).value
+                );
+
+
+            if (
+                cas <= 0
+            ) {
+
+                pokaziObvestilo(
+                    "Manjka čas",
+                    "Vpiši čas breaka."
+                );
+
+                return null;
+
+            }
+
+
+            struktura.push({
+
+                tip: "break",
+
+                cas: cas
+
+            });
+
+        }
+
+    }
+
+
+    let imaLevel =
+        struktura.some(
+            element =>
+                element.tip ===
+                "level"
+        );
+
+
+    if (!imaLevel) {
+
+        pokaziObvestilo(
+            "Ni levelov",
+            "Turnir mora imeti vsaj en level."
+        );
+
+        return null;
+
+    }
+
+
+    return struktura;
+
+}
+
+
+
+/* ======================================================== */
+/* SHRANI TURNIR                                            */
+/* ======================================================== */
+
+function shraniTurnir() {
+
+    let ime =
+        document.getElementById(
+            "imeTurnirja"
+        ).value.trim();
+
+
+    if (
+        ime === ""
+    ) {
+
+        pokaziObvestilo(
+            "Ime turnirja",
+            "Najprej vpiši ime turnirja."
+        );
+
+        return;
+
+    }
+
+
+    let struktura =
+        preberiStrukturo();
+
+
+    if (!struktura) {
+
+        return;
+
+    }
+
+
+    let turnirji =
+        JSON.parse(
+            localStorage.getItem(
+                "pokerTurnirji"
+            )
+        ) || [];
+
+
+    let index =
+        turnirji.findIndex(
+            turnir =>
+                turnir.ime ===
+                ime
+        );
+
+
+    let podatki = {
+
+        ime: ime,
+
+        leveli: struktura
+
+    };
+
+
+    function izvediShranjevanje() {
+
+        if (
+            index >= 0
+        ) {
+
+            turnirji[index] =
+                podatki;
+
+        }
+
+        else {
+
+            turnirji.push(
+                podatki
+            );
+
+        }
+
+
+        localStorage.setItem(
+            "pokerTurnirji",
+            JSON.stringify(
+                turnirji
+            )
+        );
+
+
+        prikaziShranjeneTurnirje();
+
+
+        pokaziObvestilo(
+            "Turnir shranjen",
+            "Turnir '" +
+            ime +
+            "' je uspešno shranjen."
+        );
+
+    }
+
+
+    if (
+        index >= 0
+    ) {
+
+        pokaziPotrditev(
+            "Posodobi turnir?",
+            "Turnir s tem imenom že obstaja. Ali ga želiš posodobiti?",
+            izvediShranjevanje
+        );
+
+    }
+
+    else {
+
+        izvediShranjevanje();
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* PRIKAŽI SHRANJENE TURNIRJE                               */
+/* ======================================================== */
+
+function prikaziShranjeneTurnirje() {
+
+    let prostor =
+        document.getElementById(
+            "shranjeniTurnirji"
+        );
+
+
+    let turnirji =
+        JSON.parse(
+            localStorage.getItem(
+                "pokerTurnirji"
+            )
+        ) || [];
+
+
+    prostor.innerHTML =
+        "";
+
+
+    if (
+        turnirji.length === 0
+    ) {
+
+        prostor.innerHTML =
+            "<p class='empty-text'>Ni še shranjenih turnirjev.</p>";
+
+        return;
+
+    }
+
+
+    turnirji.forEach(
+        function(
+            turnir,
+            index
+        ) {
+
+            let steviloLevelov =
+                turnir.leveli.filter(
+                    element =>
+                        element.tip ===
+                        "level"
+                ).length;
+
+
+            let steviloBreakov =
+                turnir.leveli.filter(
+                    element =>
+                        element.tip ===
+                        "break"
+                ).length;
+
+
+            let kartica =
+                document.createElement(
+                    "div"
+                );
+
+
+            kartica.className =
+                "shranjenTurnir";
+
+
+            kartica.innerHTML = `
+
+                <div class="saved-info">
+
+                    <strong>
+                        ${turnir.ime}
+                    </strong>
+
+                    <span>
+                        ${steviloLevelov} levelov
+                        •
+                        ${steviloBreakov} breakov
+                    </span>
+
+                </div>
+
+
+                <div class="saved-buttons">
+
+                    <button
+                        onclick="naloziTurnir(${index})"
+                    >
+                        NALOŽI
+                    </button>
+
+                    <button
+                        class="delete-button"
+                        onclick="izbrisiTurnir(${index})"
+                    >
+                        IZBRIŠI
+                    </button>
+
+                </div>
+
+            `;
+
+
+            prostor.appendChild(
+                kartica
+            );
+
+        }
+    );
+
+}
+
+
+
+/* ======================================================== */
+/* NALOŽI SHRANJEN TURNIR                                   */
+/* ======================================================== */
+
+function naloziTurnir(
+    index
+) {
+
+    let turnirji =
+        JSON.parse(
+            localStorage.getItem(
+                "pokerTurnirji"
+            )
+        ) || [];
+
+
+    let turnir =
+        turnirji[index];
+
+
+    if (!turnir) {
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "imeTurnirja"
+    ).value =
+        turnir.ime;
+
+
+    let levels =
+        document.getElementById(
+            "levels"
+        );
+
+
+    levels.innerHTML =
+        "";
+
+
+    turnir.leveli.forEach(
+        function(element) {
+
+            let novi =
+                document.createElement(
+                    "div"
+                );
+
+
+            novi.className =
+                "level-item";
+
+
+            novi.dataset.tip =
+                element.tip;
+
+
+            if (
+                element.tip ===
+                "level"
+            ) {
+
+                novi.innerHTML = `
+
+                    <h3>
+                        Level
+                    </h3>
+
+                    <div class="level-fields">
+
+                        <div>
+
+                            <label>
+                                SMALL BLIND
+                            </label>
+
+                            <input
+                                type="number"
+                                class="smallBlind"
+                                value="${element.sb}"
+                                min="1"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                BIG BLIND
+                            </label>
+
+                            <input
+                                type="number"
+                                class="bigBlind"
+                                value="${element.bb}"
+                                min="1"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                ČAS (MINUTE)
+                            </label>
+
+                            <input
+                                type="number"
+                                class="levelTime"
+                                value="${element.cas}"
+                                min="1"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    ${htmlGumbiElementa()}
+
+                `;
+
+            }
+
+            else {
+
+                novi.classList.add(
+                    "break-item"
+                );
+
+
+                novi.innerHTML = `
+
+                    <h3>
+                        ☕ BREAK
+                    </h3>
+
+                    <div class="level-fields">
+
+                        <div>
+
+                            <label>
+                                ČAS ODMORA (MINUTE)
+                            </label>
+
+                            <input
+                                type="number"
+                                class="breakTime"
+                                value="${element.cas}"
+                                min="1"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    ${htmlGumbiElementa()}
+
+                `;
+
+            }
+
+
+            levels.appendChild(
+                novi
+            );
+
+        }
+    );
+
+
+    osveziStevilkeLevelov();
+
+
+    pokaziObvestilo(
+        "Turnir naložen",
+        "Turnir '" +
+        turnir.ime +
+        "' je pripravljen."
+    );
+
+}
+
+
+
+/* ======================================================== */
+/* IZBRIŠI SHRANJEN TURNIR                                  */
+/* ======================================================== */
+
+function izbrisiTurnir(
+    index
+) {
+
+    let turnirji =
+        JSON.parse(
+            localStorage.getItem(
+                "pokerTurnirji"
+            )
+        ) || [];
+
+
+    if (
+        !turnirji[index]
+    ) {
+
+        return;
+
+    }
+
+
+    let ime =
+        turnirji[index].ime;
+
+
+    pokaziPotrditev(
+        "Izbriši turnir?",
+        "Ali res želiš izbrisati turnir '" +
+        ime +
+        "'?",
+        function() {
+
+            turnirji.splice(
+                index,
+                1
+            );
+
+
+            localStorage.setItem(
+                "pokerTurnirji",
+                JSON.stringify(
+                    turnirji
+                )
+            );
+
+
+            prikaziShranjeneTurnirje();
+
+
+            pokaziObvestilo(
+                "Turnir izbrisan",
+                "Turnir '" +
+                ime +
+                "' je bil izbrisan."
+            );
+
+        }
+    );
+
+}
+
+
+
+/* ======================================================== */
+/* PRIPRAVI TURNIR                                          */
+/* ======================================================== */
+
+function pripraviTurnir() {
+
+    pripraviZvok();
+
+
+    let struktura =
+        preberiStrukturo();
+
+
+    if (!struktura) {
+
+        return;
+
+    }
+
+
+    leveli =
+        struktura;
+
+
+    trenutniLevel =
+        0;
+
+
+    timerTece =
+        false;
+
+
+    konecOb =
+        null;
+
+
+    turnirKoncan =
+        false;
+
+
+    zacetekIgranja =
+        null;
+
+
+    ustaviStevecIgranja();
+
+
+    let ime =
+        document.getElementById(
+            "imeTurnirja"
+        ).value.trim();
+
+
+    document.getElementById(
+        "turnirImePrikaz"
+    ).innerText =
+        ime ||
+        "Poker Tournament";
+
+
+    document.getElementById(
+        "nastavitve"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "turnir"
+    ).style.display =
+        "block";
+
+
+    prikaziZacetekIgranja();
+
+    prikaziTrajanjeIgranja();
+
+
+    naloziTrenutniLevel(
+        false
+    );
+
+
+    shraniAktivniTurnir();
+
+}
+
+
+
+/* ======================================================== */
+/* NALOŽI TRENUTNI LEVEL                                    */
+/* ======================================================== */
+
+function naloziTrenutniLevel(
+    avtomatskiStart = false
+) {
+
+    ustaviInterval();
+
+
+    timerTece =
+        false;
+
+
+    konecOb =
+        null;
+
+
+    let element =
+        leveli[
+            trenutniLevel
+        ];
+
+
+    if (!element) {
+
+        return;
+
+    }
+
+
+    preostaliCas =
+        Math.round(
+            element.cas *
+            60
+        );
+
+
+    zadnjiPrikazanCas =
+        preostaliCas;
+
+
+    if (
+        element.tip ===
+        "level"
+    ) {
+
+        document.getElementById(
+            "blindPrikaz"
+        ).style.display =
+            "flex";
+
+
+        document.getElementById(
+            "breakPrikaz"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "levelNaslov"
+        ).innerText =
+            "LEVEL " +
+            dobiStevilkoLevela(
+                trenutniLevel
+            );
+
+
+        document.getElementById(
+            "trenutniSB"
+        ).innerText =
+            element.sb;
+
+
+        document.getElementById(
+            "trenutniBB"
+        ).innerText =
+            element.bb;
+
+    }
+
+    else {
+
+        document.getElementById(
+            "blindPrikaz"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "breakPrikaz"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "levelNaslov"
+        ).innerText =
+            "BREAK";
+
+    }
+
+
+    prikaziCas();
+
+    prikaziNaslednjega();
+
+
+    if (
+        avtomatskiStart
+    ) {
+
+        document.getElementById(
+            "timerStatus"
+        ).innerText =
+            element.tip ===
+            "break"
+                ?
+            "BREAK TEČE"
+                :
+            "LEVEL TEČE";
+
+
+        document.getElementById(
+            "startPauseButton"
+        ).innerText =
+            "⏸ PAUSE";
+
+
+        setTimeout(
+            function() {
+
+                zazeniTimer();
+
+            },
+            300
+        );
+
+    }
+
+    else {
+
+        document.getElementById(
+            "timerStatus"
+        ).innerText =
+            "PRIPRAVLJEN";
+
+
+        document.getElementById(
+            "startPauseButton"
+        ).innerText =
+            "▶ START";
+
+
+        shraniAktivniTurnir();
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* START / PAUSE                                            */
+/* ======================================================== */
+
+function startPauseTimer() {
+
+    if (
+        turnirKoncan
+    ) {
+
+        return;
+
+    }
+
+
+    pripraviZvok();
+
+
+    if (
+        timerTece
+    ) {
+
+        pavzirajTimer();
+
+    }
+
+    else {
+
+        zazeniTimer();
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* ZAŽENI TIMER                                             */
+/* ======================================================== */
+
+function zazeniTimer() {
+
+    if (
+        preostaliCas <= 0
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        zacetekIgranja ===
+        null
+    ) {
+
+        nastaviZacetekIgranja();
+
+    }
+
+
+    timerTece =
+        true;
+
+
+    konecOb =
+        Date.now() +
+        preostaliCas *
+        1000;
+
+
+    let element =
+        leveli[
+            trenutniLevel
+        ];
+
+
+    document.getElementById(
+        "startPauseButton"
+    ).innerText =
+        "⏸ PAUSE";
+
+
+    document.getElementById(
+        "timerStatus"
+    ).innerText =
+        element.tip ===
+        "break"
+            ?
+        "BREAK TEČE"
+            :
+        "LEVEL TEČE";
+
+
+    ustaviInterval();
+
+
+    interval =
+        setInterval(
+            osveziTimer,
+            200
+        );
+
+
+    shraniAktivniTurnir();
+
+}
+
+
+
+/* ======================================================== */
+/* PAUZA                                                    */
+/* ======================================================== */
+
+function pavzirajTimer() {
+
+    if (
+        !timerTece
+    ) {
+
+        return;
+
+    }
+
+
+    osveziPreostaliCas();
+
+
+    timerTece =
+        false;
+
+
+    konecOb =
+        null;
+
+
+    ustaviInterval();
+
+
+    document.getElementById(
+        "startPauseButton"
+    ).innerText =
+        "▶ NADALJUJ";
+
+
+    document.getElementById(
+        "timerStatus"
+    ).innerText =
+        "PAUZA";
+
+
+    shraniAktivniTurnir();
+
+}
+
+
+
+/* ======================================================== */
+/* INTERVAL                                                 */
+/* ======================================================== */
+
+function ustaviInterval() {
+
+    if (
+        interval
+    ) {
+
+        clearInterval(
+            interval
+        );
+
+
+        interval =
+            null;
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* PREOSTALI ČAS                                            */
+/* ======================================================== */
+
+function osveziPreostaliCas() {
+
+    if (
+        timerTece &&
+        konecOb
+    ) {
+
+        preostaliCas =
+            Math.max(
+                0,
+                Math.ceil(
+                    (
+                        konecOb -
+                        Date.now()
+                    ) / 1000
+                )
+            );
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* OSVEŽI TIMER                                             */
+/* ======================================================== */
+
+function osveziTimer() {
+
+    if (
+        !timerTece
+    ) {
+
+        return;
+
+    }
+
+
+    let prejsnjiCas =
+        preostaliCas;
+
+
+    osveziPreostaliCas();
+
+
+    if (
+        preostaliCas !==
+        zadnjiPrikazanCas
+    ) {
+
+        preveriZvok(
+            prejsnjiCas,
+            preostaliCas
+        );
+
+
+        zadnjiPrikazanCas =
+            preostaliCas;
+
+
+        prikaziCas();
+
+
+        shraniAktivniTurnir();
+
+    }
+
+
+    if (
+        preostaliCas <= 0
+    ) {
+
+        konecLevela();
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* ZVOKI                                                    */
+/* ======================================================== */
+
+function preveriZvok(
+    prejsnji,
+    trenutni
+) {
+
+    if (
+        prejsnji > 10 &&
+        trenutni <= 10
+    ) {
+
+        predvajajZvok(
+            600,
+            0.3
+        );
+
+    }
+
+
+    if (
+        trenutni <= 5 &&
+        trenutni > 0 &&
+        trenutni !==
+        prejsnji
+    ) {
+
+        predvajajZvok(
+            800,
+            0.12
+        );
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* KONEC LEVELA / BREAKA                                    */
+/* ======================================================== */
+
+function konecLevela() {
+
+    ustaviInterval();
+
+
+    timerTece =
+        false;
+
+
+    konecOb =
+        null;
+
+
+    preostaliCas =
+        0;
+
+
+    prikaziCas();
+
+
+    predvajajZvok(
+        1000,
+        0.8,
+        0.25
+    );
+
+
+    if (
+        trenutniLevel <
+        leveli.length - 1
+    ) {
+
+        trenutniLevel++;
+
+
+        /*
+            Naslednji level oziroma break
+            se začne SAMODEJNO.
+        */
+
+        naloziTrenutniLevel(
+            true
+        );
+
+    }
+
+    else {
+
+        turnirKoncan =
+            true;
+
+
+        document.getElementById(
+            "timerStatus"
+        ).innerText =
+            "TURNIR KONČAN";
+
+
+        document.getElementById(
+            "startPauseButton"
+        ).innerText =
+            "✓ KONEC";
+
+
+        prikaziTrajanjeIgranja();
+
+
+        ustaviStevecIgranja();
+
+
+        localStorage.removeItem(
+            "aktivniPokerTurnir"
+        );
+
+
+        pokaziObvestilo(
+            "Turnir je končan!",
+            "Odigran je bil zadnji level turnirja."
+        );
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* PRIKAZ TIMERJA                                           */
+/* ======================================================== */
+
+function prikaziCas() {
+
+    let minute =
+        Math.floor(
+            preostaliCas /
+            60
+        );
+
+
+    let sekunde =
+        preostaliCas %
+        60;
+
+
+    let timer =
+        document.getElementById(
+            "timer"
+        );
+
+
+    timer.innerText =
+        String(
+            minute
+        ).padStart(
+            2,
+            "0"
+        )
+        +
+        ":"
+        +
+        String(
+            sekunde
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    timer.classList.remove(
+        "timer-warning",
+        "timer-danger"
+    );
+
+
+    if (
+        preostaliCas <= 10
+    ) {
+
+        timer.classList.add(
+            "timer-danger"
+        );
+
+    }
+
+    else if (
+        preostaliCas <= 60
+    ) {
+
+        timer.classList.add(
+            "timer-warning"
+        );
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* +/- 1 MINUTA                                             */
+/* ======================================================== */
+
+function spremeniCas(
+    sekunde
+) {
+
+    if (
+        turnirKoncan
+    ) {
+
+        return;
+
+    }
+
+
+    osveziPreostaliCas();
+
+
+    preostaliCas =
+        Math.max(
+            0,
+            preostaliCas +
+            sekunde
+        );
+
+
+    if (
+        timerTece
+    ) {
+
+        konecOb =
+            Date.now() +
+            preostaliCas *
+            1000;
+
+    }
+
+
+    zadnjiPrikazanCas =
+        preostaliCas;
+
+
+    prikaziCas();
+
+
+    shraniAktivniTurnir();
+
+
+    if (
+        preostaliCas <= 0 &&
+        timerTece
+    ) {
+
+        konecLevela();
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* NASLEDNJI - ROČNO                                        */
+/* ======================================================== */
+
+function naslednjiLevel() {
+
+    if (
+        trenutniLevel >=
+        leveli.length - 1
+    ) {
+
+        pokaziObvestilo(
+            "Zadnji level",
+            "To je zadnji element turnirja."
+        );
+
+        return;
+
+    }
+
+
+    let naslednji =
+        leveli[
+            trenutniLevel + 1
+        ];
+
+
+    let opisNaslednjega;
+
+
+    if (
+        naslednji.tip ===
+        "break"
+    ) {
+
+        opisNaslednjega =
+            "BREAK";
+
+    }
+
+    else {
+
+        opisNaslednjega =
+            "Level " +
+            dobiStevilkoLevela(
+                trenutniLevel + 1
+            )
+            +
+            " (" +
+            naslednji.sb +
+            " / " +
+            naslednji.bb +
+            ")";
+
+    }
+
+
+    pokaziPotrditev(
+        "Preskoči trenutni level?",
+        "Ali res želiš predčasno nadaljevati na " +
+        opisNaslednjega +
+        "?",
+        function() {
+
+            trenutniLevel++;
+
+
+            turnirKoncan =
+                false;
+
+
+            naloziTrenutniLevel(
+                false
+            );
+
+        }
+    );
+
+}
+
+
+
+/* ======================================================== */
+/* PREJŠNJI - ROČNO                                         */
+/* ======================================================== */
+
+function prejsnjiLevel() {
+
+    if (
+        trenutniLevel <= 0
+    ) {
+
+        pokaziObvestilo(
+            "Prvi level",
+            "To je prvi element turnirja."
+        );
+
+        return;
+
+    }
+
+
+    let prejsnji =
+        leveli[
+            trenutniLevel - 1
+        ];
+
+
+    let opisPrejsnjega;
+
+
+    if (
+        prejsnji.tip ===
+        "break"
+    ) {
+
+        opisPrejsnjega =
+            "BREAK";
+
+    }
+
+    else {
+
+        opisPrejsnjega =
+            "Level " +
+            dobiStevilkoLevela(
+                trenutniLevel - 1
+            )
+            +
+            " (" +
+            prejsnji.sb +
+            " / " +
+            prejsnji.bb +
+            ")";
+
+    }
+
+
+    pokaziPotrditev(
+        "Nazaj na prejšnji level?",
+        "Ali res želiš iti nazaj na " +
+        opisPrejsnjega +
+        "?",
+        function() {
+
+            trenutniLevel--;
+
+
+            turnirKoncan =
+                false;
+
+
+            naloziTrenutniLevel(
+                false
+            );
+
+        }
+    );
+
+}
+
+
+
+/* ======================================================== */
+/* ŠTEVILKA LEVELA                                          */
+/* ======================================================== */
+
+function dobiStevilkoLevela(
+    index
+) {
+
+    let stevilka =
+        0;
+
+
+    for (
+        let i = 0;
+        i <= index;
+        i++
+    ) {
+
+        if (
+            leveli[i].tip ===
+            "level"
+        ) {
+
+            stevilka++;
+
+        }
+
+    }
+
+
+    return stevilka;
+
+}
+
+
+
+/* ======================================================== */
+/* PRIKAŽI NASLEDNJEGA                                      */
+/* ======================================================== */
+
+function prikaziNaslednjega() {
+
+    let prikaz =
+        document.getElementById(
+            "naslednjiPrikaz"
+        );
+
+
+    if (
+        trenutniLevel >=
+        leveli.length - 1
+    ) {
+
+        prikaz.innerText =
+            "KONEC TURNIRJA";
+
+        return;
+
+    }
+
+
+    let naslednji =
+        leveli[
+            trenutniLevel + 1
+        ];
+
+
+    if (
+        naslednji.tip ===
+        "break"
+    ) {
+
+        prikaz.innerText =
+            "☕ BREAK • " +
+            naslednji.cas +
+            " min";
+
+    }
+
+    else {
+
+        prikaz.innerText =
+            naslednji.sb +
+            " / " +
+            naslednji.bb;
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* SAMODEJNO SHRANJEVANJE                                   */
+/* ======================================================== */
+
+function shraniAktivniTurnir() {
+
+    if (
+        !leveli ||
+        leveli.length === 0 ||
+        turnirKoncan
+    ) {
+
+        return;
+
+    }
+
+
+    osveziPreostaliCas();
+
+
+    let podatki = {
+
+        ime:
+            document.getElementById(
+                "turnirImePrikaz"
+            ).innerText,
+
+        leveli:
+            leveli,
+
+        trenutniLevel:
+            trenutniLevel,
+
+        preostaliCas:
+            preostaliCas,
+
+        timerTece:
+            timerTece,
+
+        konecOb:
+            konecOb,
+
+        zacetekIgranja:
+            zacetekIgranja
+
+    };
+
+
+    localStorage.setItem(
+        "aktivniPokerTurnir",
+        JSON.stringify(
+            podatki
+        )
+    );
+
+}
+
+
+
+/* ======================================================== */
+/* PREVERI AKTIVNI TURNIR                                   */
+/* ======================================================== */
+
+function preveriAktivniTurnir() {
+
+    let shranjen =
+        localStorage.getItem(
+            "aktivniPokerTurnir"
+        );
+
+
+    if (!shranjen) {
+
+        return;
+
+    }
+
+
+    try {
+
+        let podatki =
+            JSON.parse(
+                shranjen
+            );
+
+
+        if (
+            !podatki.leveli ||
+            podatki.leveli.length === 0
+        ) {
+
+            return;
+
+        }
+
+
+        let element =
+            podatki.leveli[
+                podatki.trenutniLevel
+            ];
+
+
+        let opis =
+            "Turnir '" +
+            podatki.ime +
+            "'";
+
+
+        if (
+            element &&
+            element.tip ===
+            "level"
+        ) {
+
+            opis +=
+                " • " +
+                element.sb +
+                "/" +
+                element.bb;
+
+        }
+
+        else if (
+            element
+        ) {
+
+            opis +=
+                " • BREAK";
+
+        }
+
+
+        let cas =
+            podatki.preostaliCas;
+
+
+        if (
+            podatki.timerTece &&
+            podatki.konecOb
+        ) {
+
+            cas =
+                Math.max(
+                    0,
+                    Math.ceil(
+                        (
+                            podatki.konecOb -
+                            Date.now()
+                        ) / 1000
+                    )
+                );
+
+        }
+
+
+        let minute =
+            Math.floor(
+                cas / 60
+            );
+
+
+        let sekunde =
+            cas % 60;
+
+
+        opis +=
+            " • " +
+            String(
+                minute
+            ).padStart(
+                2,
+                "0"
+            )
+            +
+            ":"
+            +
+            String(
+                sekunde
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        document.getElementById(
+            "resumeBesedilo"
+        ).innerText =
+            opis;
+
+
+        document.getElementById(
+            "resumeOverlay"
+        ).classList.add(
+            "show"
+        );
+
+    }
+
+    catch (napaka) {
+
+        localStorage.removeItem(
+            "aktivniPokerTurnir"
+        );
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* NADALJUJ AKTIVNI TURNIR                                  */
+/* ======================================================== */
+
+function nadaljujAktivniTurnir() {
+
+    let podatki =
+        JSON.parse(
+            localStorage.getItem(
+                "aktivniPokerTurnir"
+            )
+        );
+
+
+    if (!podatki) {
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "resumeOverlay"
+    ).classList.remove(
+        "show"
+    );
+
+
+    leveli =
+        podatki.leveli;
+
+
+    trenutniLevel =
+        podatki.trenutniLevel;
+
+
+    turnirKoncan =
+        false;
+
+
+    zacetekIgranja =
+        podatki.zacetekIgranja ||
+        null;
+
+
+    document.getElementById(
+        "turnirImePrikaz"
+    ).innerText =
+        podatki.ime;
+
+
+    document.getElementById(
+        "nastavitve"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "turnir"
+    ).style.display =
+        "block";
+
+
+    prikaziZacetekIgranja();
+
+
+    if (
+        zacetekIgranja
+    ) {
+
+        zazeniStevecIgranja();
+
+    }
+
+    else {
+
+        prikaziTrajanjeIgranja();
+
+    }
+
+
+    let element =
+        leveli[
+            trenutniLevel
+        ];
+
+
+    if (
+        element.tip ===
+        "level"
+    ) {
+
+        document.getElementById(
+            "blindPrikaz"
+        ).style.display =
+            "flex";
+
+
+        document.getElementById(
+            "breakPrikaz"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "levelNaslov"
+        ).innerText =
+            "LEVEL " +
+            dobiStevilkoLevela(
+                trenutniLevel
+            );
+
+
+        document.getElementById(
+            "trenutniSB"
+        ).innerText =
+            element.sb;
+
+
+        document.getElementById(
+            "trenutniBB"
+        ).innerText =
+            element.bb;
+
+    }
+
+    else {
+
+        document.getElementById(
+            "blindPrikaz"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "breakPrikaz"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "levelNaslov"
+        ).innerText =
+            "BREAK";
+
+    }
+
+
+    preostaliCas =
+        podatki.preostaliCas;
+
+
+    if (
+        podatki.timerTece &&
+        podatki.konecOb
+    ) {
+
+        preostaliCas =
+            Math.max(
+                0,
+                Math.ceil(
+                    (
+                        podatki.konecOb -
+                        Date.now()
+                    ) / 1000
+                )
+            );
+
+    }
+
+
+    timerTece =
+        false;
+
+
+    konecOb =
+        null;
+
+
+    zadnjiPrikazanCas =
+        preostaliCas;
+
+
+    prikaziCas();
+
+    prikaziNaslednjega();
+
+
+    document.getElementById(
+        "timerStatus"
+    ).innerText =
+        "OBNOVLJENO • PAUZA";
+
+
+    document.getElementById(
+        "startPauseButton"
+    ).innerText =
+        "▶ NADALJUJ";
+
+
+    shraniAktivniTurnir();
+
+}
+
+
+
+/* ======================================================== */
+/* ZAVRZI AKTIVNI TURNIR                                    */
+/* ======================================================== */
+
+function zavrziAktivniTurnir() {
+
+    localStorage.removeItem(
+        "aktivniPokerTurnir"
+    );
+
+
+    document.getElementById(
+        "resumeOverlay"
+    ).classList.remove(
+        "show"
+    );
+
+}
+
+
+
+/* ======================================================== */
+/* FULLSCREEN                                               */
+/* ======================================================== */
+
+function fullscreen() {
+
+    if (
+        !document.fullscreenElement
+    ) {
+
+        document.documentElement
+            .requestFullscreen()
+            .catch(
+                function() {
+
+                    pokaziObvestilo(
+                        "Napaka",
+                        "Celozaslonskega načina ni bilo mogoče odpreti."
+                    );
+
+                }
+            );
+
+    }
+
+    else {
+
+        document.exitFullscreen();
+
+    }
+
+}
+
+
+
+/* ======================================================== */
+/* NAZAJ NA NASTAVITVE                                      */
+/* ======================================================== */
+
+function koncajPrikaz() {
+
+    pokaziPotrditev(
+        "Nazaj na nastavitve?",
+        "Trenutni timer se bo ustavil in aktivni potek turnirja bo odstranjen.",
+        function() {
+
+            ustaviInterval();
+
+            ustaviStevecIgranja();
+
+
+            timerTece =
+                false;
+
+
+            konecOb =
+                null;
+
+
+            zacetekIgranja =
+                null;
+
+
+            localStorage.removeItem(
+                "aktivniPokerTurnir"
+            );
+
+
+            document.getElementById(
+                "turnir"
+            ).style.display =
+                "none";
+
+
+            document.getElementById(
+                "nastavitve"
+            ).style.display =
+                "block";
+
+
+            if (
+                document.fullscreenElement
+            ) {
+
+                document.exitFullscreen();
+
+            }
+
+        }
+    );
+
+}
+
+
+
+/* ======================================================== */
+/* TIPKOVNICA                                               */
+/* ======================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        let turnirOdprt =
+            document.getElementById(
+                "turnir"
+            ).style.display !==
+            "none";
+
+
+        let modalOdprt =
+            document.querySelector(
+                ".modal-overlay.show"
+            );
+
+
+        if (
+            modalOdprt
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            !turnirOdprt
+        ) {
+
+            return;
+
+        }
+
+
+        /* SPACE = START / PAUSE */
+
+        if (
+            event.code ===
+            "Space"
+        ) {
+
+            event.preventDefault();
+
+            startPauseTimer();
+
+        }
+
+
+        /* DESNA PUŠČICA */
+
+        if (
+            event.key ===
+            "ArrowRight"
+        ) {
+
+            naslednjiLevel();
+
+        }
+
+
+        /* LEVA PUŠČICA */
+
+        if (
+            event.key ===
+            "ArrowLeft"
+        ) {
+
+            prejsnjiLevel();
+
+        }
+
+
+        /* F = FULLSCREEN */
+
+        if (
+            event.key.toLowerCase() ===
+            "f"
+        ) {
+
+            fullscreen();
+
+        }
+
+    }
+);
+
+
+
+/* ======================================================== */
+/* ZAGON                                                    */
+/* ======================================================== */
+
+prikaziShranjeneTurnirje();
+
+
+osveziStevilkeLevelov();
+
+
+setTimeout(
+    preveriAktivniTurnir,
+    300
+);
+
+</script>
+
+</body>
+
+</html>
